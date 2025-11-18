@@ -1,0 +1,188 @@
+:root {
+    --primary: #4361ee;
+    --secondary: #3a0ca3;
+    --accent: #4cc9f0;
+    --dark: #1a1a2e;
+    --light: #f8f9fa;
+    --gray: #8d99ae;
+    --bg: #eef2ff; /* light blue background */
+    --radius: 10px;
+    --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+
+/* Body & Background  */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+    color: #333;
+}
+
+/* Container  */
+.container {
+    background: rgba(255, 255, 255, 0.95); /* Slight transparency */
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    margin-top: 40px;
+}
+
+/* Headings  */
+h2 {
+    font-weight: 700;
+    color: #1565c0;
+    border-left: 5px solid #2196f3;
+    padding-left: 10px;
+    margin-bottom: 20px;
+}
+
+/*  Tables  */
+.table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.table thead {
+    background: linear-gradient(90deg, #42a5f5, #478ed1);
+    color: #fff;
+    font-weight: 600;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(66, 165, 245, 0.05);
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+/* Buttons  */
+.btn-primary {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 50px;
+    padding: 10px 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #764ba2, #667eea);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.btn-danger {
+    background: linear-gradient(90deg, #ff416c, #ff4b2b);
+    border: none;
+    color: #fff;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(90deg, #ff4b2b, #ff416c);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255,75,43,0.3);
+}
+
+/* Edit Form */
+.edit-form {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-top: 40px;
+    transition: all 0.3s ease;
+}
+
+.edit-form h3 {
+    color: #1565c0;
+    margin-bottom: 20px;
+}
+
+.edit-form .form-control {
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+/*  Responsive  */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        margin-top: 20px;
+    }
+}
+
+/* ===== Animated Multicolor Gradient Background ===== */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(
+    -45deg,
+    #ff9a9e,
+    #fad0c4,
+    #a1c4fd,
+    #c2e9fb,
+    #fbc2eb,
+    #a6c0fe,
+    #fccb90,
+    #d4fc79,
+    #84fab0,
+    #8fd3f4,
+    #f6d365,
+    #fda085,
+    #fccb90,
+    #a1c4fd
+  );
+  background-size: 1500% 1500%;
+  animation: gradientShift 20s ease infinite;
+  color: #222;
+  font-family: 'Poppins', sans-serif;
+  transition: background 1s ease-in-out;
+}
+
+/* Smooth animated color transition */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 50% 100%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  75% {
+    background-position: 50% 0%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Optional: make tables and forms stand out */
+.container {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  margin-top: 40px;
+}
