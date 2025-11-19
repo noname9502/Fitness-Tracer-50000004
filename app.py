@@ -99,10 +99,11 @@ def signup():
     email = request.form['signup-email']
     password = request.form['signup-password']
 
-    email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+    email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     if not re.match(email_pattern, email):
         flash("Invalid email format!", "danger")
         return redirect(url_for('login_page'))
+
 
     # Strong password validation
     password_pattern = r"^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
@@ -114,6 +115,7 @@ def signup():
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     # Save to database
+    # All database operations use parameterized queries (%s placeholders), which prevents SQL injection attacks.
     cur = mysql.connection.cursor()
     try:
         cur.execute(
@@ -317,6 +319,50 @@ def update_activity(activity_id):
 def logout():
     session.clear()  # Clear user session
     return redirect(url_for('home'))  # Redirect to login_signup.html
+
+@app.route('/stats')
+def get_stats():
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT COUNT(*) FROM users")
+    total_users = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(*) FROM activities")
+    total_activities = cur.fetchone()[0]
+
+    cur.execute("SELECT COALESCE(SUM(calories), 0) FROM activities")
+    total_calories = cur.fetchone()[0]
+
+    # Fetch all activity types with counts
+    cur.execute("""
+        SELECT activityType, COUNT(*) AS cnt
+        FROM activities
+        GROUP BY activityType
+        ORDER BY cnt DESC
+    """)
+    results = cur.fetchall()
+
+    # Handle cases
+    if not results:
+        most_common_activity = "No activities"
+    else:
+        highest_count = results[0][1]
+
+        if highest_count == 1:
+            most_common_activity = "No repeated activity types"
+        else:
+            most_common_activity = results[0][0]
+
+    cur.close()
+
+    return jsonify({
+        "total_users": total_users,
+        "total_activities": total_activities,
+        "total_calories": total_calories,
+        "most_common_activity": most_common_activity
+    })
+
+
 
 if __name__ == '__main__':
     app.run(
