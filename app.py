@@ -199,7 +199,12 @@ def login():
         
 @app.route('/index')
 def index():
-    return render_template('index.html')
+    if not session.get('user_id'):  # If user is NOT logged in
+        flash("Please log in first!", "danger")
+        return redirect(url_for('login_page'))
+
+    return render_template('index.html')  # If logged in → allow access
+
 
 
 # ACTIVITY LOGGING ROUTE (Rate limited)
@@ -209,30 +214,64 @@ def index():
 @app.route('/log_activity', methods=['POST'])
 @limiter.limit("20 per minute")
 def log_activity():
+    # Check if user is logged in
+    if 'user_id' not in session:
+        return jsonify(message="Unauthorized"), 401
+
     data = request.get_json()
+
     activityType = data['activityType']
     duration = data['duration']
     calories = data['calories']
     date = data['date']
-    
+
+    user_id = session['user_id']   # <-- IMPORTANT
+
     cur = mysql.connection.cursor()
-    cur.execute(
-        "INSERT INTO activities (activityType, duration, calories, date) VALUES (%s, %s, %s, %s)",
-        (activityType, duration, calories, date)
+    cur.execute("""
+        INSERT INTO activities (activityType, duration, calories, date, user_id)
+        VALUES (%s, %s, %s, %s, %s)
+        """,
+        (activityType, duration, calories, date, user_id)
     )
     mysql.connection.commit()
     cur.close()
 
     return jsonify(message='Activity logged successfully!')
 
+
 @app.route('/get_log_history', methods=['GET'])
 def get_log_history():
+    # 1. Check if the user is logged in
+    if not session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    user_id = session["user_id"]  # Logged-in user ID
+
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM activities")
+
+    # 2. Return ONLY this user's activities
+    query = """
+        SELECT id, activityType, duration, calories, date
+        FROM activities
+        WHERE user_id = %s
+        ORDER BY date DESC
+    """
+
+    cur.execute(query, (user_id,))
     activities = cur.fetchall()
     cur.close()
-    
-    return jsonify(activities=[{'id': activity[0], 'activityType': activity[1], 'duration': activity[2], 'calories': activity[3], 'date': activity[4]} for activity in activities])
+
+    return jsonify(activities=[
+        {
+            'id': a[0], 
+            'activityType': a[1],
+            'duration': a[2],
+            'calories': a[3],
+            'date': a[4]
+        } for a in activities
+    ])
+
 
 @app.route('/delete_activity/<int:activity_id>', methods=['DELETE'])
 def delete_activity(activity_id):
@@ -254,11 +293,36 @@ def get_users():
 @app.route('/get_activities', methods=['GET'])
 def get_activities():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT id, activityType, duration, calories, date FROM activities")
+
+    query = """
+        SELECT 
+            activities.id,
+            users.email,
+            activities.activityType,
+            activities.duration,
+            activities.calories,
+            activities.date
+        FROM activities
+        LEFT JOIN users ON activities.user_id = users.id
+        ORDER BY activities.id DESC
+    """
+
+    cur.execute(query)
     activities = cur.fetchall()
     cur.close()
 
-    return jsonify([{'id': activity[0], 'activityType': activity[1], 'duration': activity[2], 'calories': activity[3], 'date': activity[4]} for activity in activities])
+    return jsonify([
+        {
+            'id': a[0],
+            'email': a[1],
+            'activityType': a[2],
+            'duration': a[3],
+            'calories': a[4],
+            'date': a[5]
+        }
+        for a in activities
+    ])
+
 
 @app.route('/delete_user/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
