@@ -23,6 +23,7 @@
         });
     }
 
+    
     // Fetch activities from the server
     async function fetchActivities() {
         const response = await fetch('/get_activities');
@@ -35,6 +36,7 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${activity.id}</td>
+                <td>${activity.email}</td>
                 <td>${activity.activityType}</td>
                 <td>${activity.duration}</td>
                 <td>${activity.calories}</td>
@@ -171,8 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStats();   
 });
 
-
-
+// Fetch and display aggregated statistics from the server
 async function loadStats() {
     const statsBox = document.getElementById("stats-box");
 
@@ -192,10 +193,18 @@ async function loadStats() {
             <p><strong>Most Common Activity:</strong> ${data.most_common_activity}</p>
         `;
     } catch (error) {
-        statsBox.innerHTML = `<p class="text-danger">⚠️ Error loading statistics</p>`;
+        statsBox.innerHTML = `<p class="text-danger"> Error loading statistics</p>`;
         console.error("Stats load error:", error);
     }
 }
+
+// Logout 
+function logoutUser() {
+    window.location.assign('/logout');
+}
+
+document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+
 
 window.onload = loadStats;
 
